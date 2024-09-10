@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Analysis</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Swing Trading Stock Analysis</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>Symbol</th>
+                    <th>Price</th>
+                    <th>20 DMA</th>
+                    <th>50 DMA</th>
+                    <th>100 DMA</th>
+                    <th>200 DMA</th>
+                    <th>52-Week High</th>
+                    <th>52-Week Low</th>
+                    <th>From 52-Week High (%)</th>
+                    <th>RSI (14-Day)</th>
+                    <th>Volume</th>
+                    <th>Support & Resistance</th>
+                    <th>Low Price</th>
+                    <th>Close Price</th>
+                    <th>Buy Signal</th>
+                    <th>Stop-Loss</th>
+                    <th>Target Price</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for stock in stock_data %}
+                <tr>
+                    <td>{{ stock.symbol }}</td>
+                    <td>{{ stock.price | float | round(2) if stock.price is defined and stock.price is not none else 'N/A' }}</td>
+                    <td>{{ stock['20DMA'] | float | round(2) if stock['20DMA'] is defined and stock['20DMA'] is not none else 'N/A' }}</td>
+                    <td>{{ stock['50DMA'] | float | round(2) if stock['50DMA'] is defined and stock['50DMA'] is not none else 'N/A' }}</td>
+                    <td>{{ stock['100DMA'] | float | round(2) if stock['100DMA'] is defined and stock['100DMA'] is not none else 'N/A' }}</td>
+                    <td>{{ stock['200DMA'] | float | round(2) if stock['200DMA'] is defined and stock['200DMA'] is not none else 'N/A' }}</td>
+                    <td>{{ stock['52_week_high'] | float | round(2) if stock['52_week_high'] is defined and stock['52_week_high'] is not none else 'N/A' }}</td>
+                    <td>{{ stock['52_week_low'] | float | round(2) if stock['52_week_low'] is defined and stock['52_week_low'] is not none else 'N/A' }}</td>
+                    <td>{{ stock['from_52_week_high'] | float | round(2) if stock['from_52_week_high'] is defined and stock['from_52_week_high'] is not none else 'N/A' }}%</td>
+                    <td>{{ stock['RSI'] | float | round(2) if stock['RSI'] is defined and stock['RSI'] is not none else 'N/A' }}</td>
+                    <td>{{ stock['volume'] if stock['volume'] is defined else 'N/A' }}</td>
+                    <td>{{ stock['support_resistance'] if stock['support_resistance'] is defined else 'N/A' }}</td>
+                    <td>{{ stock['low_price'] | float | round(2) if stock['low_price'] is defined and stock['low_price'] is not none else 'N/A' }}</td>
+                    <td>{{ stock['close_price'] | float | round(2) if stock['close_price'] is defined and stock['close_price'] is not none else 'N/A' }}</td>
+
+                    <!-- Buy Signal Column with conditional class for styling -->
+                    <td class="{% if stock['buy_signal'] == 'BUY' %}buy-signal{% else %}no-buy-signal{% endif %}">
+                        {{ stock['buy_signal'] }}
+                    </td>
+
+                    <td>{{ stock['stop_loss'] | float | round(2) if stock['stop_loss'] is defined and stock['stop_loss'] is not none else 'N/A' }}</td>
+                    <td>{{ stock['target_price'] | float | round(2) if stock['target_price'] is defined and stock['target_price'] is not none else 'N/A' }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
