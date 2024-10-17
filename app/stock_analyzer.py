@@ -56,9 +56,10 @@ def get_stock_data(symbol):
 def calculate_trend(data):
     """Check if the trend is bullish based on moving averages."""
     last_row = data.iloc[-1]
-    if last_row['20DMA'] > last_row['50DMA'] > last_row['100DMA'] > last_row['200DMA']:
+    # Relaxed condition: Allow more flexibility in DMA alignment
+    if last_row['20DMA'] > last_row['50DMA'] and last_row['100DMA'] > last_row['200DMA']:
         return "Bullish"
-    elif last_row['20DMA'] < last_row['50DMA'] < last_row['100DMA'] < last_row['200DMA']:
+    elif last_row['20DMA'] < last_row['50DMA'] and last_row['100DMA'] < last_row['200DMA']:
         return "Bearish"
     else:
         return "Sideways"
@@ -130,21 +131,21 @@ def analyze_stock(symbol):
     volume = last_row['Volume']
     avg_volume = last_row['avg_volume']
 
-    # Adjust conditions to make the logic more flexible
-    near_support = price <= support * 1.10  # Buy if price is within 10% of support
-    near_resistance = price >= resistance * 0.90  # Avoid if price is within 10% of resistance
+    # Relax conditions to make the logic more flexible
+    near_support = price <= support * 1.25  # Relaxed to within 20% of support
+    near_resistance = price >= resistance * 0.90  # Keep strict: Avoid if within 10% of resistance
 
-    # Relax volume confirmation: allow range within 90% to 110% of avg volume
-    volume_confirmation = volume >= avg_volume * 0.90  # More lenient volume check
+    # Relax volume confirmation: allow range within 80-120% of avg volume
+    volume_confirmation = volume >= avg_volume * 0.70  # Loosen to allow slightly lower volumes
 
-    # Relax RSI condition: Allow RSI up to 40
+    # Relax RSI condition: Allow RSI between 30-55 for a valid buy signal
     if (
-        last_row['20DMA'] > last_row['50DMA']
-        and last_row['RSI'] < 30  # Relaxed RSI condition
-        and trend == "Bullish"
-        and near_support
-        and not near_resistance
-        and volume_confirmation
+    last_row['20DMA'] > last_row['50DMA'] > last_row['100DMA'] > last_row['200DMA']  # Checking all DMAs
+    and 30 <= last_row['RSI'] <= 60  # Relaxed RSI condition (between 30-60)
+    and trend == "Bullish"
+    and near_support
+    and not near_resistance
+    and volume_confirmation
     ):
         buy_signal = "BUY"
     else:
